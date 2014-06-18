@@ -6,15 +6,18 @@ import com.codahale.metrics.servlets.MetricsServlet;
 import com.mycompany.myapp.web.filter.CachingHttpHeadersFilter;
 import com.mycompany.myapp.web.filter.StaticResourcesProductionFilter;
 import com.mycompany.myapp.web.filter.gzip.GZipServletFilter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.context.embedded.ServletContextInitializer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 
 import javax.inject.Inject;
 import javax.servlet.*;
+
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -71,6 +74,19 @@ public class WebConfigurer implements ServletContextInitializer {
         compressingFilter.setAsyncSupported(true);
     }
 
+    private void initUrlRewriteProductionFilter(ServletContext servletContext, EnumSet<DispatcherType> disps) {
+        log.debug("Registering tuckey urlrewritefilter");
+
+        FilterRegistration.Dynamic urlRewriteFilter = servletContext.addFilter("urlRewriteFilter", new UrlRewriteFilter());
+        if (env.acceptsProfiles(Constants.SPRING_PROFILE_PRODUCTION)) {
+            urlRewriteFilter.setInitParameter("confPath", "urlrewrite-prod.xml");
+        } else {
+            urlRewriteFilter.setInitParameter("confPath", "urlrewrite.xml");
+        }
+
+        urlRewriteFilter.addMappingForUrlPatterns(disps, true, "/*");
+    }    
+    
     /**
      * Initializes the static resources production Filter.
      */

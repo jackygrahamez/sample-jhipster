@@ -6,8 +6,8 @@ var jhipsterApp = angular.module('jhipsterApp', ['http-auth-interceptor', 'tmh.d
     'ngResource', 'ngRoute', 'ngCookies', 'jhipsterAppUtils', 'pascalprecht.translate', 'truncate']);
 
 jhipsterApp
-    .config(['$routeProvider', '$httpProvider', '$translateProvider',  'tmhDynamicLocaleProvider', 'USER_ROLES',
-        function ($routeProvider, $httpProvider, $translateProvider, tmhDynamicLocaleProvider, USER_ROLES) {
+    .config(['$routeProvider', '$locationProvider', '$httpProvider', '$translateProvider',  'tmhDynamicLocaleProvider', 'USER_ROLES',
+        function ($routeProvider, $locationProvider, $httpProvider, $translateProvider, tmhDynamicLocaleProvider, USER_ROLES) {
             $routeProvider
                 .when('/register', {
                     templateUrl: 'views/register.html',
@@ -109,6 +109,9 @@ jhipsterApp
                     }
                 });
 
+            $locationProvider
+            .html5Mode(true);
+            
             // Initialize angular-translate
             $translateProvider.useStaticFilesLoader({
                 prefix: 'i18n/',
